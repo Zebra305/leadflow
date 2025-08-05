@@ -94,7 +94,13 @@ class Lead(db.Model):
     def is_ready_for_next_message(self):
         """
         Check if enough time (2 days) has passed since last message was sent
+        Only check timing if there's actually been a message sent before
         """
+        # If no messages have been sent yet, ready to send first message
+        if not any([self.sent, self.sent_0, self.sent_1, self.sent_2, self.sent_3, self.sent_4, self.sent_5]):
+            return True
+        
+        # If any message has been sent, check if 2 days have passed since last update
         if not self.updated_at:
             return True
         
@@ -104,8 +110,10 @@ class Lead(db.Model):
     
     def get_last_sent_timestamp(self):
         """Get the timestamp of when the last message was sent"""
-        # This would be the updated_at field when a message was marked as sent
-        return self.updated_at
+        # If any message has been sent, return updated_at, otherwise None
+        if any([self.sent, self.sent_0, self.sent_1, self.sent_2, self.sent_3, self.sent_4, self.sent_5]):
+            return self.updated_at
+        return None
     
     def get_next_available_time(self):
         """Get when the next message can be sent (2 days after last sent)"""

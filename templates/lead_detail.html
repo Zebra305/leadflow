@@ -175,7 +175,7 @@
                                 <pre class="mb-0 text-wrap">{{ msg.message }}</pre>
                             </div>
                             
-                            <div class="d-flex gap-2">
+                            <div class="d-flex gap-2 flex-wrap">
                                 <button class="btn btn-sm btn-outline-primary" onclick="copyToClipboard(`{{ msg.message|replace('`', '\\`')|replace('\\', '\\\\')|replace('\n', '\\n') }}`)">
                                     <i class="fas fa-copy me-1"></i>Copy
                                 </button>
@@ -185,6 +185,10 @@
                                        class="btn btn-sm btn-success">
                                         <i class="fas fa-check me-1"></i>Mark as Sent
                                     </a>
+                                {% else %}
+                                    <span class="btn btn-sm btn-outline-success disabled">
+                                        <i class="fas fa-check me-1"></i>Already Sent
+                                    </span>
                                 {% endif %}
                                 
                                 {% if msg.sent and not msg.replied %}
@@ -192,6 +196,10 @@
                                        class="btn btn-sm btn-info">
                                         <i class="fas fa-reply me-1"></i>Mark as Replied
                                     </a>
+                                {% elif msg.replied %}
+                                    <span class="btn btn-sm btn-outline-info disabled">
+                                        <i class="fas fa-reply me-1"></i>Already Replied
+                                    </span>
                                 {% endif %}
                             </div>
                         </div>

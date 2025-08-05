@@ -34,9 +34,47 @@ def dashboard():
                 'hours_left': max(0, hours_left)
             })
     
+    # Get leads waiting for replies (sent messages without replies)
+    awaiting_replies = []
+    for lead in all_leads:
+        sent_messages = []
+        
+        # Check initial outreach
+        if lead.sent and not lead.replied and lead.outreach:
+            sent_messages.append({
+                'type': 'Initial Outreach',
+                'message': lead.outreach,
+                'suffix': ''
+            })
+        
+        # Check follow-ups
+        follow_ups = [
+            ('Follow-up 1', lead.follow_up_0, lead.sent_0, lead.replied_0, '_0'),
+            ('Follow-up 2', lead.follow_up_1, lead.sent_1, lead.replied_1, '_1'),
+            ('Follow-up 3', lead.follow_up_2, lead.sent_2, lead.replied_2, '_2'),
+            ('Follow-up 4', lead.follow_up_3, lead.sent_3, lead.replied_3, '_3'),
+            ('Follow-up 5', lead.follow_up_4, lead.sent_4, lead.replied_4, '_4'),
+            ('Follow-up 6', lead.follow_up_5, lead.sent_5, lead.replied_5, '_5'),
+        ]
+        
+        for msg_type, message_text, sent, replied, suffix in follow_ups:
+            if sent and not replied and message_text:
+                sent_messages.append({
+                    'type': msg_type,
+                    'message': message_text,
+                    'suffix': suffix
+                })
+        
+        if sent_messages:
+            awaiting_replies.append({
+                'lead': lead,
+                'sent_messages': sent_messages
+            })
+    
     return render_template('dashboard.html', 
                          ready_leads=ready_leads, 
-                         waiting_leads=waiting_leads)
+                         waiting_leads=waiting_leads,
+                         awaiting_replies=awaiting_replies)
 
 @app.route('/search')
 def search():

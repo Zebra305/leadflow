@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Lead Details - Lead Outreach Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>
+                    <i class="fas fa-user me-2"></i>
+                    {% if lead.email %}
+                        {{ lead.email }}
+                    {% elif lead.website %}
+                        {{ lead.website }}
+                    {% else %}
+                        Lead #{{ lead.id }}
+                    {% endif %}
+                </h1>
+                <p class="text-muted">Lead ID: {{ lead.id }}</p>
+            </div>
+            <div>
+                <a href="{{ url_for('search') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Search
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lead Information -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>Contact Information</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    {% if lead.email %}
+                    <dt class="col-sm-3">Email:</dt>
+                    <dd class="col-sm-9">
+                        <i class="fas fa-envelope me-1"></i>{{ lead.email }}
+                    </dd>
+                    {% endif %}
+                    
+                    {% if lead.website %}
+                    <dt class="col-sm-3">Website:</dt>
+                    <dd class="col-sm-9">
+                        <i class="fas fa-globe me-1"></i>
+                        <a href="{{ lead.website }}" target="_blank">{{ lead.website }}</a>
+                    </dd>
+                    {% endif %}
+                    
+                    {% if lead.telegram %}
+                    <dt class="col-sm-3">Telegram:</dt>
+                    <dd class="col-sm-9">
+                        <i class="fab fa-telegram me-1"></i>{{ lead.telegram }}
+                    </dd>
+                    {% endif %}
+                    
+                    <dt class="col-sm-3">Created:</dt>
+                    <dd class="col-sm-9">{{ lead.created_at.strftime('%Y-%m-%d %H:%M') if lead.created_at }}</dd>
+                    
+                    <dt class="col-sm-3">Updated:</dt>
+                    <dd class="col-sm-9">{{ lead.updated_at.strftime('%Y-%m-%d %H:%M') if lead.updated_at }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-flag me-2"></i>Lead Status</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Free Demo:</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-{{ 'success' if lead.free_demo else 'secondary' }}">
+                            {{ 'Yes' if lead.free_demo else 'No' }}
+                        </span>
+                    </dd>
+                    
+                    <dt class="col-sm-4">Meeting:</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-{{ 'success' if lead.meeting else 'secondary' }}">
+                            {{ 'Yes' if lead.meeting else 'No' }}
+                        </span>
+                    </dd>
+                    
+                    <dt class="col-sm-4">Money In:</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-{{ 'success' if lead.money_in else 'secondary' }}">
+                            {{ 'Yes' if lead.money_in else 'No' }}
+                        </span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Message -->
+{% if current_message %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-{{ 'success' if is_ready else 'warning' }}">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-{{ 'paper-plane' if is_ready else 'clock' }} me-2"></i>
+                    Current Message: {{ current_message_type }}
+                </h4>
+                {% if not is_ready %}
+                    <small class="text-warning">
+                        <i class="fas fa-clock me-1"></i>
+                        Available: {{ next_available.strftime('%Y-%m-%d %H:%M') }}
+                    </small>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="message-container p-3 bg-dark rounded mb-3">
+                    <pre class="mb-0 text-wrap">{{ current_message }}</pre>
+                </div>
+                
+                {% if is_ready %}
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="copyToClipboard(`{{ current_message|replace('`', '\\`')|replace('\\', '\\\\')|replace('\n', '\\n') }}`)">
+                        <i class="fas fa-copy me-1"></i>Copy Message
+                    </button>
+                    <a href="{{ url_for('mark_sent', lead_id=lead.id, suffix=current_suffix) }}" 
+                       class="btn btn-success">
+                        <i class="fas fa-check me-1"></i>Mark as Sent
+                    </a>
+                </div>
+                {% else %}
+                <p class="text-warning mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    This message cannot be sent yet due to the 2-day delay rule.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Message History -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-history me-2"></i>Message History</h4>
+            </div>
+            <div class="card-body">
+                {% if message_history %}
+                    {% for msg in message_history %}
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">{{ msg.type }}</h6>
+                            <div>
+                                {% if msg.replied %}
+                                    <span class="badge bg-info me-2">Replied</span>
+                                {% endif %}
+                                {% if msg.sent %}
+                                    <span class="badge bg-success">Sent</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Not Sent</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="message-container p-3 bg-dark rounded mb-3">
+                                <pre class="mb-0 text-wrap">{{ msg.message }}</pre>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-primary" onclick="copyToClipboard(`{{ msg.message|replace('`', '\\`')|replace('\\', '\\\\')|replace('\n', '\\n') }}`)">
+                                    <i class="fas fa-copy me-1"></i>Copy
+                                </button>
+                                
+                                {% if not msg.sent %}
+                                    <a href="{{ url_for('mark_sent', lead_id=lead.id, suffix=msg.suffix) }}" 
+                                       class="btn btn-sm btn-success">
+                                        <i class="fas fa-check me-1"></i>Mark as Sent
+                                    </a>
+                                {% endif %}
+                                
+                                {% if msg.sent and not msg.replied %}
+                                    <a href="{{ url_for('mark_replied', lead_id=lead.id, suffix=msg.suffix) }}" 
+                                       class="btn btn-sm btn-info">
+                                        <i class="fas fa-reply me-1"></i>Mark as Replied
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No messages found</h4>
+                        <p class="text-muted">This lead doesn't have any outreach messages yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

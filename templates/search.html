@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Search Leads - Lead Outreach Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="fas fa-search me-2"></i>Search Leads</h1>
+        <p class="text-muted">Find leads by email, website, telegram, or ID</p>
+    </div>
+</div>
+
+<!-- Search Form -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('search') }}">
+                    <div class="input-group">
+                        <input type="text" 
+                               class="form-control" 
+                               name="q" 
+                               value="{{ query }}" 
+                               placeholder="Search by email, website, telegram, or ID..."
+                               autofocus>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search me-1"></i>Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Results -->
+{% if query %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Search Results ({{ results|length }})
+                </h3>
+                <small class="text-muted">Results for "{{ query }}"</small>
+            </div>
+            <div class="card-body">
+                {% if results %}
+                    {% for lead in results %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5 class="card-title mb-2">
+                                        {% if lead.email %}
+                                            <i class="fas fa-envelope me-1"></i>{{ lead.email }}
+                                        {% elif lead.website %}
+                                            <i class="fas fa-globe me-1"></i>{{ lead.website }}
+                                        {% else %}
+                                            <i class="fas fa-user me-1"></i>Lead #{{ lead.id }}
+                                        {% endif %}
+                                    </h5>
+                                    
+                                    <div class="lead-info">
+                                        <small class="text-muted">
+                                            <i class="fas fa-hashtag me-1"></i>ID: {{ lead.id }}
+                                            {% if lead.website %}
+                                                <i class="fas fa-globe me-1 ms-3"></i>{{ lead.website }}
+                                            {% endif %}
+                                            {% if lead.telegram %}
+                                                <i class="fab fa-telegram me-1 ms-3"></i>{{ lead.telegram }}
+                                            {% endif %}
+                                            <i class="fas fa-calendar me-1 ms-3"></i>{{ lead.created_at.strftime('%Y-%m-%d') if lead.created_at }}
+                                        </small>
+                                    </div>
+                                    
+                                    <!-- Status indicators -->
+                                    <div class="mt-2">
+                                        {% set message, msg_type, suffix = lead.get_current_message_info() %}
+                                        {% if message %}
+                                            {% if lead.is_ready_for_next_message() %}
+                                                <span class="badge bg-success">Ready: {{ msg_type }}</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Waiting: {{ msg_type }}</span>
+                                            {% endif %}
+                                        {% elif msg_type == "Replied" %}
+                                            <span class="badge bg-info">{{ msg_type }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ msg_type }}</span>
+                                        {% endif %}
+                                        
+                                        <!-- Show sent/replied counts -->
+                                        {% set sent_count = [lead.sent, lead.sent_0, lead.sent_1, lead.sent_2, lead.sent_3, lead.sent_4, lead.sent_5] | select('true') | list | length %}
+                                        {% set replied_count = [lead.replied, lead.replied_0, lead.replied_1, lead.replied_2, lead.replied_3, lead.replied_4, lead.replied_5] | select('true') | list | length %}
+                                        
+                                        <span class="badge bg-outline-primary ms-2">{{ sent_count }} Sent</span>
+                                        {% if replied_count > 0 %}
+                                            <span class="badge bg-outline-success ms-1">{{ replied_count }} Replied</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4 text-end">
+                                    <a href="{{ url_for('lead_detail', lead_id=lead.id) }}" 
+                                       class="btn btn-primary">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No results found</h4>
+                        <p class="text-muted">Try searching with different keywords.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

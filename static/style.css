@@ -1,0 +1,153 @@
+/* Custom styles for Lead Outreach Manager */
+
+/* Message containers */
+.message-container {
+    border: 1px solid var(--bs-border-color);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.message-container pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--bs-body-color);
+}
+
+/* Action buttons */
+.btn-group-vertical .btn {
+    margin-bottom: 0.25rem;
+}
+
+.btn-group-vertical .btn:last-child {
+    margin-bottom: 0;
+}
+
+/* Lead cards */
+.card.border-success {
+    border-width: 2px !important;
+}
+
+.card.border-warning {
+    border-width: 2px !important;
+}
+
+/* Status badges */
+.badge {
+    font-size: 0.75rem;
+}
+
+/* Lead info styling */
+.lead-info {
+    font-size: 0.85rem;
+}
+
+/* Copy button feedback */
+.btn-success {
+    transition: all 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .btn-group-vertical {
+        width: 100%;
+    }
+    
+    .message-container {
+        max-height: 150px;
+    }
+    
+    .card-body .row .col-md-4 {
+        margin-top: 1rem;
+    }
+}
+
+/* Message history styling */
+.message-container {
+    font-size: 0.9rem;
+}
+
+/* Navigation improvements */
+.navbar-brand {
+    font-weight: 600;
+}
+
+/* Status indicators */
+.text-success {
+    color: var(--bs-success) !important;
+}
+
+.text-warning {
+    color: var(--bs-warning) !important;
+}
+
+.text-info {
+    color: var(--bs-info) !important;
+}
+
+/* Card hover effects */
+.card {
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Form improvements */
+.input-group .form-control {
+    border-radius: 0.375rem 0 0 0.375rem;
+}
+
+.input-group .btn {
+    border-radius: 0 0.375rem 0.375rem 0;
+}
+
+/* Alert positioning */
+.alert {
+    margin-bottom: 1rem;
+}
+
+/* Empty state styling */
+.text-center i.fa-3x {
+    opacity: 0.5;
+}
+
+/* Timeline-like message history */
+.message-history .card {
+    position: relative;
+    margin-left: 2rem;
+}
+
+.message-history .card::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 1rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--bs-primary);
+}
+
+/* Lead status indicators */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Button loading states */
+.btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* Highlight search results */
+.search-highlight {
+    background-color: var(--bs-warning);
+    color: var(--bs-dark);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+}

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Lead Outreach Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="fas fa-tachometer-alt me-2"></i>Outreach Dashboard</h1>
+        <p class="text-muted">Manage your lead outreach campaigns with 2-day delay enforcement</p>
+    </div>
+</div>
+
+<!-- Ready to Send Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-paper-plane text-success me-2"></i>
+                    Ready to Send ({{ ready_leads|length }})
+                </h3>
+                <small class="text-muted">Messages ready to be sent now</small>
+            </div>
+            <div class="card-body">
+                {% if ready_leads %}
+                    {% for item in ready_leads %}
+                    <div class="card mb-3 border-success">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="card-title">
+                                        <span class="badge bg-success me-2">{{ item.message_type }}</span>
+                                        {% if item.lead.email %}
+                                            <i class="fas fa-envelope me-1"></i>{{ item.lead.email }}
+                                        {% elif item.lead.website %}
+                                            <i class="fas fa-globe me-1"></i>{{ item.lead.website }}
+                                        {% elif item.lead.telegram %}
+                                            <i class="fab fa-telegram me-1"></i>{{ item.lead.telegram }}
+                                        {% else %}
+                                            <i class="fas fa-user me-1"></i>Lead #{{ item.lead.id }}
+                                        {% endif %}
+                                    </h5>
+                                    
+                                    <div class="message-container p-3 bg-dark rounded mb-3">
+                                        <pre class="mb-0 text-wrap">{{ item.message }}</pre>
+                                    </div>
+                                    
+                                    <div class="lead-info">
+                                        <small class="text-muted">
+                                            {% if item.lead.website %}
+                                                <i class="fas fa-globe me-1"></i>{{ item.lead.website }}
+                                            {% endif %}
+                                            {% if item.lead.telegram %}
+                                                <i class="fab fa-telegram me-1 ms-3"></i>{{ item.lead.telegram }}
+                                            {% endif %}
+                                            <i class="fas fa-calendar me-1 ms-3"></i>Created: {{ item.lead.created_at.strftime('%Y-%m-%d %H:%M') if item.lead.created_at }}
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4 text-end">
+                                    <div class="btn-group-vertical d-grid gap-2">
+                                        <button class="btn btn-outline-primary" onclick="copyToClipboard(`{{ item.message|replace('`', '\\`')|replace('\\', '\\\\')|replace('\n', '\\n') }}`)">
+                                            <i class="fas fa-copy me-1"></i>Copy Message
+                                        </button>
+                                        <a href="{{ url_for('mark_sent', lead_id=item.lead.id, suffix=item.suffix) }}" 
+                                           class="btn btn-success">
+                                            <i class="fas fa-check me-1"></i>Mark as Sent
+                                        </a>
+                                        <a href="{{ url_for('lead_detail', lead_id=item.lead.id) }}" 
+                                           class="btn btn-outline-secondary">
+                                            <i class="fas fa-eye me-1"></i>View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No messages ready to send</h4>
+                        <p class="text-muted">All leads are either completed or waiting for the 2-day delay period.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Waiting Section -->
+{% if waiting_leads %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-clock text-warning me-2"></i>
+                    Waiting for 2-Day Delay ({{ waiting_leads|length }})
+                </h3>
+                <small class="text-muted">Messages that need to wait before sending</small>
+            </div>
+            <div class="card-body">
+                {% for item in waiting_leads %}
+                <div class="card mb-2 border-warning">
+                    <div class="card-body py-2">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <strong>
+                                    {% if item.lead.email %}
+                                        <i class="fas fa-envelope me-1"></i>{{ item.lead.email }}
+                                    {% elif item.lead.website %}
+                                        <i class="fas fa-globe me-1"></i>{{ item.lead.website }}
+                                    {% else %}
+                                        <i class="fas fa-user me-1"></i>Lead #{{ item.lead.id }}
+                                    {% endif %}
+                                </strong>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="badge bg-warning">{{ item.message_type }}</span>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                {% if item.hours_left > 24 %}
+                                    <span class="text-warning">
+                                        <i class="fas fa-clock me-1"></i>{{ (item.hours_left / 24)|round|int }} days left
+                                    </span>
+                                {% else %}
+                                    <span class="text-warning">
+                                        <i class="fas fa-clock me-1"></i>{{ item.hours_left }} hours left
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

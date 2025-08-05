@@ -1,0 +1,142 @@
+-- Table: public.outreach_campaigns
+
+-- DROP TABLE IF EXISTS public.outreach_campaigns;
+
+CREATE TABLE IF NOT EXISTS public.outreach_campaigns
+(
+    id bigint NOT NULL DEFAULT nextval('outreach_campaigns_id_seq'::regclass),
+    url text COLLATE pg_catalog."default" NOT NULL,
+    raw_html text COLLATE pg_catalog."default",
+    image_to_text text COLLATE pg_catalog."default",
+    telegram character varying(255) COLLATE pg_catalog."default",
+    email character varying(255) COLLATE pg_catalog."default",
+    website character varying(255) COLLATE pg_catalog."default",
+    outreach text COLLATE pg_catalog."default",
+    sent boolean DEFAULT false,
+    replied boolean DEFAULT false,
+    follow_up_0 text COLLATE pg_catalog."default",
+    sent_0 boolean DEFAULT false,
+    replied_0 boolean DEFAULT false,
+    follow_up_1 text COLLATE pg_catalog."default",
+    sent_1 boolean DEFAULT false,
+    replied_1 boolean DEFAULT false,
+    follow_up_2 text COLLATE pg_catalog."default",
+    sent_2 boolean DEFAULT false,
+    replied_2 boolean DEFAULT false,
+    follow_up_3 text COLLATE pg_catalog."default",
+    sent_3 boolean DEFAULT false,
+    replied_3 boolean DEFAULT false,
+    follow_up_4 text COLLATE pg_catalog."default",
+    sent_4 boolean DEFAULT false,
+    replied_4 boolean DEFAULT false,
+    follow_up_5 text COLLATE pg_catalog."default",
+    sent_5 boolean DEFAULT false,
+    replied_5 boolean DEFAULT false,
+    free_demo boolean DEFAULT false,
+    meeting boolean DEFAULT false,
+    money_in numeric(10,2),
+    extracted_text_from_image text COLLATE pg_catalog."default",
+    processed_main boolean DEFAULT false,
+    processed_text boolean DEFAULT false,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    created_by character varying(255) COLLATE pg_catalog."default",
+    last_modified_by character varying(255) COLLATE pg_catalog."default",
+    "SWOT" text COLLATE pg_catalog."default",
+    "ExtractionAgent" text COLLATE pg_catalog."default",
+    "SolutionsAgent" text COLLATE pg_catalog."default",
+    CONSTRAINT outreach_campaigns_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.outreach_campaigns
+    OWNER to n8n_user;
+
+REVOKE ALL ON TABLE public.outreach_campaigns FROM readonly_user;
+
+GRANT ALL ON TABLE public.outreach_campaigns TO n8n_user;
+
+GRANT SELECT ON TABLE public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(sent) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(replied) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(sent_0) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(replied_0) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(sent_1) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(replied_1) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(sent_2) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(replied_2) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(sent_3) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(replied_3) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(sent_4) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(replied_4) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(sent_5) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(replied_5) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(updated_at) ON public.outreach_campaigns TO readonly_user;
+
+GRANT UPDATE(created_by) ON public.outreach_campaigns TO readonly_user;
+-- Index: idx_outreach_created_by
+
+-- DROP INDEX IF EXISTS public.idx_outreach_created_by;
+
+CREATE INDEX IF NOT EXISTS idx_outreach_created_by
+    ON public.outreach_campaigns USING btree
+    (created_by COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_outreach_email
+
+-- DROP INDEX IF EXISTS public.idx_outreach_email;
+
+CREATE INDEX IF NOT EXISTS idx_outreach_email
+    ON public.outreach_campaigns USING btree
+    (email COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_outreach_processed_main
+
+-- DROP INDEX IF EXISTS public.idx_outreach_processed_main;
+
+CREATE INDEX IF NOT EXISTS idx_outreach_processed_main
+    ON public.outreach_campaigns USING btree
+    (processed_main ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_outreach_sent
+
+-- DROP INDEX IF EXISTS public.idx_outreach_sent;
+
+CREATE INDEX IF NOT EXISTS idx_outreach_sent
+    ON public.outreach_campaigns USING btree
+    (sent ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_outreach_url
+
+-- DROP INDEX IF EXISTS public.idx_outreach_url;
+
+CREATE INDEX IF NOT EXISTS idx_outreach_url
+    ON public.outreach_campaigns USING btree
+    (url COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+-- Trigger: update_outreach_campaigns_updated_at
+
+-- DROP TRIGGER IF EXISTS update_outreach_campaigns_updated_at ON public.outreach_campaigns;
+
+CREATE OR REPLACE TRIGGER update_outreach_campaigns_updated_at
+    BEFORE UPDATE 
+    ON public.outreach_campaigns
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();

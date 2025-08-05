@@ -46,12 +46,16 @@ def search():
     
     if query:
         # Search across multiple fields
-        search_filter = or_(
+        search_conditions = [
             Lead.email.ilike(f'%{query}%'),
             Lead.website.ilike(f'%{query}%'),
-            Lead.telegram.ilike(f'%{query}%'),
-            Lead.id == query if query.isdigit() else False
-        )
+            Lead.telegram.ilike(f'%{query}%')
+        ]
+        
+        if query.isdigit():
+            search_conditions.append(Lead.id == int(query))
+            
+        search_filter = or_(*search_conditions)
         results = Lead.query.filter(search_filter).all()
     
     return render_template('search.html', query=query, results=results)

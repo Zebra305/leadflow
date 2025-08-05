@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import text
 
 class Lead(db.Model):
-    __tablename__ = 'leads'
+    __tablename__ = 'outreach_campaigns'
     
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.Text)
@@ -46,10 +46,10 @@ class Lead(db.Model):
     # Additional fields
     free_demo = db.Column(db.Boolean, default=False)
     meeting = db.Column(db.Boolean, default=False)
-    money_in = db.Column(db.Boolean, default=False)
+    money_in = db.Column(db.Numeric(10, 2))
     extracted_text_from_image = db.Column(db.Text)
-    processed_main = db.Column(db.Text)
-    processed_text = db.Column(db.Text)
+    processed_main = db.Column(db.Boolean, default=False)
+    processed_text = db.Column(db.Boolean, default=False)
     
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -60,6 +60,7 @@ class Lead(db.Model):
     # Additional fields
     SWOT = db.Column(db.Text)
     ExtractionAgent = db.Column(db.Text)
+    SolutionsAgent = db.Column(db.Text)
     
     def get_current_message_info(self):
         """
